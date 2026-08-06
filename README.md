@@ -2,7 +2,8 @@
 
 | name | address |
 |------|---------|
-| LiquidityLauncer | 0x0000FffFBE8efE702c8703aE3477FF5dE3d319C0 |
+| multicall | 0x0000FffFBE8efE702c8703aE3477FF5dE3d319C0 |
+| LiquidityLauncer |  |
 
 ## Crowd Launch: Create Token calldata
 
