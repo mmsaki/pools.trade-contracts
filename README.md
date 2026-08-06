@@ -1,9 +1,28 @@
 ## Pools.trade
 
-| name | address |
-|------|---------|
-| multicall | 0x0000FffFBE8efE702c8703aE3477FF5dE3d319C0 |
-| LiquidityLauncer |  |
+Robinhood Chain mainnet. Recovered from the captured multicall calldata below,
+verified to hold bytecode on-chain; the launcher/factory pair also verified
+against live TokenCreated events.
+
+| name | address | role |
+|------|---------|------|
+| LiquidityLauncher | 0x0000FffFBE8efE702c8703aE3477FF5dE3d319C0 | the multicall entry: createToken + distributeToken / distributeWithNative |
+| UERC20Factory | 0x000000e200088d55C39a11F609E5F667729AD49b | mints the token; emits TokenCreated(token, metadata{description, website, image}) |
+| Liquidity strategy | 0x23f8209572b4A1c2AD88a42749E830791fb027F1 | instant launch: initializes the v4 pool (hookless, native ETH, fee 2500, spacing 25) and locks the full-range position |
+| Crowd (CCA) strategy | 0x1242C9439d589CAE85E121b1f79F2af51e91dcEe | crowd launch: runs the TWAP-bid auction; pool only at graduation (distributeWithNative) |
+| Liquidity locker | 0xEfF166aAf189323C58dc27eD1206Eb2c37fAacdF | holds the minted LP position permanently |
+| Universal Router | 0x8876789976dEcBfCbBbe364623C63652db8C0904 | swaps, same router as the rest of the chain |
+
+Selectors in the captures: `0xac9650d8` multicall, `0xdec14be1` createToken,
+`0xb6982b48` distributeToken(token, (strategy, uint128 amount, bytes config),
+salt), `0x0ef847b6` distributeWithNative (the crowd item3 paste lost its
+leading zero).
+
+Listening for launches: subscribe to the launcher's
+`TokenCreated(address indexed)` (topic `0x2e2b3f61b70d2d13…`). The same
+receipt carries the factory's metadata event and — for instant launches — the
+PoolManager's `Initialize` with the pool id, so one receipt read yields
+identity, art, and the tradable pool.
 
 ## Crowd Launch: Create Token calldata
 
