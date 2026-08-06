@@ -5,9 +5,7 @@ import {LaunchBase, IERC20Meta, IStateView} from "./LaunchBase.sol";
 import {Distribution} from "../src/types/Distribution.sol";
 
 interface IUniversalRouter {
-    function execute(bytes calldata commands, bytes[] calldata inputs, uint256 deadline)
-        external
-        payable;
+    function execute(bytes calldata commands, bytes[] calldata inputs, uint256 deadline) external payable;
 }
 
 interface IPermit2 {
@@ -41,8 +39,7 @@ struct ExactInputSingleParams {
 /// byte-identical encoding the trenches bot sends: commands [V4_SWAP],
 /// actions [SWAP_EXACT_IN_SINGLE, SETTLE_ALL, TAKE_ALL].
 contract TradeLaunchTest is LaunchBase {
-    IUniversalRouter constant ROUTER =
-        IUniversalRouter(0x8876789976dEcBfCbBbe364623C63652db8C0904);
+    IUniversalRouter constant ROUTER = IUniversalRouter(0x8876789976dEcBfCbBbe364623C63652db8C0904);
     IPermit2 constant PERMIT2 = IPermit2(0x000000000022D473030F116dDEE9F6B43aC78BA3);
 
     bytes1 constant V4_SWAP = 0x10;
@@ -56,23 +53,16 @@ contract TradeLaunchTest is LaunchBase {
         super.setUp();
         token = createToken("John Pork", "JOHN", "ipfs://bafkreitest");
         LAUNCHER.distributeToken(
-            token,
-            Distribution(LIQUIDITY_STRATEGY, SUPPLY, abi.encode(address(this))),
-            keccak256("trade-launch-test")
+            token, Distribution(LIQUIDITY_STRATEGY, SUPPLY, abi.encode(address(this))), keccak256("trade-launch-test")
         );
         vm.deal(address(this), 10 ether);
     }
 
     receive() external payable {}
 
-    function swapCalldata(bool buy, uint128 amountIn, uint128 minOut)
-        internal
-        view
-        returns (bytes memory)
-    {
+    function swapCalldata(bool buy, uint128 amountIn, uint128 minOut) internal view returns (bytes memory) {
         PoolKey memory key = PoolKey(address(0), token, 2500, 25, address(0));
-        bytes memory params0 =
-            abi.encode(ExactInputSingleParams(key, buy, amountIn, minOut, 0, ""));
+        bytes memory params0 = abi.encode(ExactInputSingleParams(key, buy, amountIn, minOut, 0, ""));
         (address input, address output) = buy ? (address(0), token) : (token, address(0));
         bytes memory params1 = abi.encode(input, uint256(amountIn));
         bytes memory params2 = abi.encode(output, uint256(minOut));
@@ -121,9 +111,7 @@ contract TradeLaunchTest is LaunchBase {
     function test_permit2_allowance_is_fixed_at_infinity() public {
         (bool ok,) = token.call(abi.encodeCall(IERC20Approve.approve, (address(PERMIT2), 1)));
         assertFalse(ok, "approve to Permit2 reverts by design");
-        assertEq(
-            IERC20Meta(token).allowance(address(this), address(PERMIT2)), type(uint256).max
-        );
+        assertEq(IERC20Meta(token).allowance(address(this), address(PERMIT2)), type(uint256).max);
     }
 
     function test_sell_back_through_permit2() public {

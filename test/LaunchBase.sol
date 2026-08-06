@@ -31,8 +31,7 @@ interface IStateView {
 /// Robinhood Chain mainnet deployment, as observed live. See the README's
 /// contract table for how each address was recovered and verified.
 abstract contract LaunchBase is Test {
-    ILiquidityLauncher constant LAUNCHER =
-        ILiquidityLauncher(0x0000FffFBE8efE702c8703aE3477FF5dE3d319C0);
+    ILiquidityLauncher constant LAUNCHER = ILiquidityLauncher(0x0000FffFBE8efE702c8703aE3477FF5dE3d319C0);
     address constant UERC20_FACTORY = 0x000000e200088D55C39a11F609E5F667729ad49b;
     address constant LIQUIDITY_STRATEGY = 0x23f8209572b4a1C2AD88A42749E830791Fb027f1;
     address constant CROWD_TOKEN_STRATEGY = 0x05d552391067389EE44fec3924157ed33F976000;
@@ -46,15 +45,9 @@ abstract contract LaunchBase is Test {
         vm.createSelectFork(vm.envOr("ROBINHOOD_RPC", string("https://rpc.mainnet.chain.robinhood.com/rpc")));
     }
 
-    function createToken(string memory name, string memory symbol, string memory image)
-        internal
-        returns (address)
-    {
-        bytes memory tokenData =
-            abi.encode(UERC20Metadata("a launch test", "https://example.com", image, ""));
-        return LAUNCHER.createToken(
-            UERC20_FACTORY, name, symbol, 18, SUPPLY, address(LAUNCHER), tokenData
-        );
+    function createToken(string memory name, string memory symbol, string memory image) internal returns (address) {
+        bytes memory tokenData = abi.encode(UERC20Metadata("a launch test", "https://example.com", image, ""));
+        return LAUNCHER.createToken(UERC20_FACTORY, name, symbol, 18, SUPPLY, address(LAUNCHER), tokenData);
     }
 
     bytes constant CFG_TEMPLATE =

@@ -15,7 +15,7 @@ import {Distribution} from "../src/types/Distribution.sol";
 /// (supply split, $10K graduation target, fee 2500, spacing 50, price
 /// schedule) are kept verbatim.
 contract CrowdLaunchTest is LaunchBase {
-        function test_crowd_launch_hands_the_supply_to_the_auction() public {
+    function test_crowd_launch_hands_the_supply_to_the_auction() public {
         address token = createToken("John Pork", "JOHN", "ipfs://bafkreitest");
         LAUNCHER.distributeToken(
             token,
@@ -23,8 +23,6 @@ contract CrowdLaunchTest is LaunchBase {
             keccak256("crowd-launch-test")
         );
         assertEq(IERC20Meta(token).balanceOf(address(LAUNCHER)), 0, "auction pulled everything");
-        assertEq(
-            STATE_VIEW.getLiquidity(poolId(token, 2500, 50)), 0, "no pool until graduation"
-        );
+        assertEq(STATE_VIEW.getLiquidity(poolId(token, 2500, 50)), 0, "no pool until graduation");
     }
 }

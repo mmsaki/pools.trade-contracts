@@ -10,13 +10,10 @@ interface ICrowdStrategy {
 }
 
 interface ICCA {
-    function submitBid(
-        uint256 maxPrice,
-        uint128 amount,
-        address owner,
-        uint256 prevTickPrice,
-        bytes calldata data
-    ) external payable returns (uint256 bidId);
+    function submitBid(uint256 maxPrice, uint128 amount, address owner, uint256 prevTickPrice, bytes calldata data)
+        external
+        payable
+        returns (uint256 bidId);
     function exitBid(uint256 bidId) external;
     function claimTokensBatch(address owner, uint256[] calldata bidIds) external;
     function floorPrice() external view returns (uint256);
@@ -98,9 +95,8 @@ contract CrowdBidTest is LaunchBase {
     ///   - the bid is still exitable after the end, whole.
     function test_claims_wait_for_graduation_and_the_bid_stays_exitable() public {
         uint256 price = alignedPrice();
-        uint256 bidId = ICCA(auction).submitBid{value: 0.6 ether}(
-            price, 0.6 ether, address(this), ICCA(auction).floorPrice(), ""
-        );
+        uint256 bidId =
+            ICCA(auction).submitBid{value: 0.6 ether}(price, 0.6 ether, address(this), ICCA(auction).floorPrice(), "");
         for (uint256 i = 0; i < 23; i++) {
             vm.roll(block.number + 6000);
             ICCA(auction).checkpoint();

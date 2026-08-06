@@ -11,9 +11,7 @@ interface ITokenURI {
 
 contract LauncherSafetyTest is LaunchBase {
     function test_graffiti_is_the_keccak_of_the_creator() public view {
-        assertEq(
-            LAUNCHER.getGraffiti(address(this)), keccak256(abi.encode(address(this)))
-        );
+        assertEq(LAUNCHER.getGraffiti(address(this)), keccak256(abi.encode(address(this))));
     }
 
     function test_zero_recipient_is_refused() public {
@@ -26,9 +24,7 @@ contract LauncherSafetyTest is LaunchBase {
         vm.expectEmit(true, true, false, true, address(LAUNCHER));
         emit ILiquidityLauncher.TokenDistributed(token, LIQUIDITY_STRATEGY, SUPPLY);
         LAUNCHER.distributeToken(
-            token,
-            Distribution(LIQUIDITY_STRATEGY, SUPPLY, abi.encode(address(this))),
-            keccak256("events-test")
+            token, Distribution(LIQUIDITY_STRATEGY, SUPPLY, abi.encode(address(this))), keccak256("events-test")
         );
     }
 
@@ -51,9 +47,7 @@ contract LauncherSafetyTest is LaunchBase {
         address token = createToken("John Pork", "JOHN", "ipfs://bafkreitest");
         address thief = makeAddr("thief");
         vm.prank(thief);
-        LAUNCHER.distributeToken(
-            token, Distribution(LIQUIDITY_STRATEGY, SUPPLY, abi.encode(thief)), bytes32(0)
-        );
+        LAUNCHER.distributeToken(token, Distribution(LIQUIDITY_STRATEGY, SUPPLY, abi.encode(thief)), bytes32(0));
         assertEq(IERC20Meta(token).balanceOf(address(LAUNCHER)), 0, "the thief distributed our supply");
     }
 }

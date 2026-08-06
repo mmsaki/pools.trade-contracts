@@ -15,9 +15,7 @@ contract InstantLaunchTest is LaunchBase {
         assertEq(IERC20Meta(token).balanceOf(address(LAUNCHER)), SUPPLY);
 
         LAUNCHER.distributeToken(
-            token,
-            Distribution(LIQUIDITY_STRATEGY, SUPPLY, abi.encode(address(this))),
-            keccak256("instant-launch-test")
+            token, Distribution(LIQUIDITY_STRATEGY, SUPPLY, abi.encode(address(this))), keccak256("instant-launch-test")
         );
 
         assertEq(IERC20Meta(token).balanceOf(address(LAUNCHER)), 0, "strategy pulled everything");
