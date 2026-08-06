@@ -17,6 +17,7 @@ interface IERC20Meta {
     function symbol() external view returns (string memory);
     function totalSupply() external view returns (uint256);
     function balanceOf(address) external view returns (uint256);
+    function allowance(address, address) external view returns (uint256);
 }
 
 interface IStateView {
