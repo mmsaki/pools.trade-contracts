@@ -58,5 +58,5 @@ migrate(address auction)           // on the strategy
 
 `forge test` — forks mainnet
 
-- launch, bid, refund, trade, safety
-- uncovered: claiming a graduated auction
+- launch, bid, refund, graduated claim, trade, safety
+- uncovered: `migrate` — keeper work, too gas-heavy on a rolled fork

@@ -93,6 +93,52 @@ contract CrowdBidTest is LaunchBase {
     /// rules a bidder actually meets instead of faking one:
     ///   - claims revert NotGraduated until the raise clears,
     ///   - the bid is still exitable after the end, whole.
+    /// Demand across the whole window, which is what graduation takes: the
+    /// auction issues on a schedule and sells only what is bid for in each
+    /// candle, so a lone opening bid leaves the raise short however large it
+    /// is. Bid each chunk above the price the last chunk cleared at.
+    function bidThroughWindow(uint256 chunks, uint256 perBid) internal {
+        for (uint256 i = 0; i < chunks; i++) {
+            vm.roll(block.number + WINDOW_BLOCKS / (chunks + 2));
+            ICCA(auction).checkpoint();
+            uint256 fl = ICCA(auction).floorPrice();
+            uint256 sp = ICCA(auction).tickSpacing();
+            uint256 cl = ICCA(auction).clearingPrice();
+            uint256 above = fl + (((cl - fl) / sp) + 3000) * sp;
+            ICCA(auction).submitBid{value: perBid}(above, uint128(perBid), address(this), fl, "");
+        }
+    }
+
+    function test_a_graduated_auction_pays_out() public {
+        vm.deal(address(this), 5000 ether);
+        bidThroughWindow(60, 80 ether);
+        vm.roll(block.number + WINDOW_BLOCKS);
+        ICCA(auction).checkpoint();
+        assertTrue(ICCA(auction).isGraduated(), "sustained demand cleared the target");
+
+        // A bid sitting AT the final clearing price is only partially filled
+        // and exits through its own path; the rest exit plainly. Claiming the
+        // ones that exited is what proves the payout.
+        uint256[] memory ids = new uint256[](60);
+        uint256 n;
+        for (uint256 i = 0; i < 60; i++) {
+            try ICCA(auction).exitBid(i) {
+                ids[n++] = i;
+            } catch {}
+        }
+        assertGt(n, 0, "winning bids exited");
+        uint256[] memory exited = new uint256[](n);
+        for (uint256 i = 0; i < n; i++) {
+            exited[i] = ids[i];
+        }
+        ICCA(auction).claimTokensBatch(address(this), exited);
+        assertGt(IERC20Meta(token).balanceOf(address(this)), 0, "tokens delivered");
+
+        // migrate() is left to the keepers: seeding the pool walks every
+        // candle of the window, which a fork's rolled blocks make far more
+        // expensive than the real thing, where it is touched all along.
+    }
+
     function test_claims_wait_for_graduation_and_the_bid_stays_exitable() public {
         uint256 price = alignedPrice();
         uint256 bidId =
