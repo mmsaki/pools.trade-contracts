@@ -1,0 +1,17 @@
+{
+  "lib/forge-std": {
+    "tag": {
+      "name": "v1.16.2",
+      "rev": "bf647bd6046f2f7da30d0c2bf435e5c76a780c1b"
+    }
+  },
+  "lib/permit2": {
+    "rev": "cc56ad0f3439c502c246fc5cfcc3db92bb8b7219"
+  },
+  "lib/uerc20-factory": {
+    "tag": {
+      "name": "v2.0.0",
+      "rev": "6f18f1cdf80dc173d33d3cd6bbe91ee52c314f68"
+    }
+  }
+}
